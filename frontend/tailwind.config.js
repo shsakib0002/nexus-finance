@@ -7,17 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        nexus: {
-          bg: '#050505',
-          accent: '#00ff88',
-          accent2: '#00ccff',
-          card: 'rgba(255, 255, 255, 0.03)',
-          border: 'rgba(255, 255, 255, 0.1)',
-        }
+        // These match the classes used in your Dashboard.jsx
+        'nexus-bg': '#050505',
+        'nexus-card': 'rgba(20, 20, 20, 0.7)', 
+        'nexus-border': '#333333',
+        'nexus-accent': '#00ff88', // The glowing green color
       },
       fontFamily: {
-        display: ['Syncopate', 'sans-serif'],
-        body: ['Space Grotesk', 'sans-serif'],
+        // These match the font names we loaded
+        orbitron: ['"Orbitron"', 'sans-serif'],
+        rajdhani: ['"Rajdhani"', 'sans-serif'],
+      },
+      backgroundImage: {
+        'grid-pattern': "linear-gradient(to right, #111 1px, transparent 1px), linear-gradient(to bottom, #111 1px, transparent 1px)",
       }
     },
   },
