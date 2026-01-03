@@ -43,32 +43,69 @@ class DashboardStats(SQLModel):
     grocery_total: float
     habits_count: int
 
+# --- BANGLADESHI DAILY LIFE DATABASE ---
+BD_COMMON_ITEMS = [
+    # 🚗 TRANSPORT (যাতায়াত)
+    "Rickshaw Fare", "Bus Fare (Local)", "Bus Fare (Sitting/Webill)", "Metro Rail Ticket",
+    "CNG Fare", "Pathao/Uber Ride", "Auto Rickshaw Fare", "Train Ticket",
+    "Launch Ticket", "Boat Fare (Nouka)", "Bicycle Repair", "Fuel (Octane/Petrol)",
+
+    # 💊 HEALTH & MEDICAL (স্বাস্থ্য)
+    "Doctor Visit Fee", "Medicine (Napa/Paracetamol)", "Medicine (Sergel/Gastric)", 
+    "Medicine (Antibiotic)", "Medical Test (Blood/X-Ray)", "Insulin", "Saline", 
+    "Mask/Sanitizer", "Dental Checkup",
+
+    # 🏠 HOME & UTILITIES (বাসাবাড়ি ও বিল)
+    "Electricity Bill (Prepaid)", "Gas Bill (Titas)", "Water Bill (WASA)", 
+    "Internet Bill (Wifi)", "Mobile Recharge (GP/Robi/BL/Teletalk)", 
+    "Dish/Cable Bill", "Bua/Maid Salary", "Garbage Bill",
+    "LED Bulb", "Energy Saving Light", "Multiplug", "Lock & Key",
+
+    # 🛒 DAILY GROCERY & FOOD (বাজার-সদাই)
+    "Miniket Rice", "Nazirshail Rice", "Basmati Rice", "Soybean Oil", "Mustard Oil",
+    "Lentil (Mosur Dal)", "Onion (Deshi)", "Potato", "Broiler Chicken", "Beef", 
+    "Fish (Rui/Katla)", "Egg (Farm)", "Milk (Liquid)", "Powder Milk",
+    "Tea Leaves", "Sugar", "Salt", "Biscuits/Toast",
+
+    # 👗 LIFESTYLE & PERSONAL (কেনাকাটা)
+    "Panjabi", "Saree", "T-Shirt/Shirt", "Shoes/Sandals", "Tailoring Charge",
+    "Haircut/Salon", "Cosmetics", "Perfume/Body Spray", "Shampoo", "Soap", "Toothpaste",
+
+    # 🎁 GIFTS & SOCIAL (সামাজিকতা)
+    "Wedding Gift", "Birthday Gift", "Donation (Sadaqah)", "Treat for Friends",
+
+    # 🛠 REPAIRS & MISC (মেরামত ও অন্যান্য)
+    "Mobile Repair", "Laptop/PC Repair", "Shoe Repair (Muchi)", 
+    "Photocopy/Print", "Courier Charge"
+]
+
 # --- FASTAPI APP ---
 app = FastAPI()
 
-# --- CORS MIDDLEWARE (Required for Vercel to talk to Render) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
 
-# --- ROOT ROUTE (Fixes 404 Error) ---
 @app.get("/")
 def read_root():
     return {"message": "Nexus Finance Backend is Running!"}
 
 # --- ENDPOINTS ---
 
+@app.get("/products/", response_model=List[str])
+def get_products():
+    return BD_COMMON_ITEMS
+
 @app.post("/expenses/")
 def create_expense(expense: Expense, session: Session = Depends(get_session)):
-    # No-Spend Day Check (Logic Placeholder)
     habit = session.exec(select(Habit).where(Habit.habit == "No Spend Day")).first()
     if habit and habit.active:
         raise HTTPException(status_code=403, detail="No-Spend Day is active!")
@@ -86,8 +123,6 @@ def read_expenses(session: Session = Depends(get_session)):
 @app.post("/groceries/")
 def create_grocery(grocery: Grocery, session: Session = Depends(get_session)):
     session.add(grocery)
-    
-    # Auto-add to expenses
     expense = Expense(
         amount=grocery.price * grocery.quantity,
         category="Groceries",
