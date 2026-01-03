@@ -5,7 +5,7 @@ import AddExpenseForm from './AddExpenseForm';
 
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = 'https://nexus-finance-backend-dbod.onrender.com';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ total_expenses: 0, grocery_total: 0, habits_count: 0 });
