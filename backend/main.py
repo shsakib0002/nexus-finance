@@ -44,6 +44,9 @@ class DashboardStats(SQLModel):
 
 # --- FASTAPI APP ---
 app = FastAPI()
+@app.get("/")
+def read_root():
+    return {"message": "Nexus Finance Backend is Running!"}
 
 @app.on_event("startup")
 def on_startup():
