@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from datetime import date
 
@@ -44,13 +45,24 @@ class DashboardStats(SQLModel):
 
 # --- FASTAPI APP ---
 app = FastAPI()
-@app.get("/")
-def read_root():
-    return {"message": "Nexus Finance Backend is Running!"}
+
+# --- CORS MIDDLEWARE (Required for Vercel to talk to Render) ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+
+# --- ROOT ROUTE (Fixes 404 Error) ---
+@app.get("/")
+def read_root():
+    return {"message": "Nexus Finance Backend is Running!"}
 
 # --- ENDPOINTS ---
 
